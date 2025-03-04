@@ -10,7 +10,7 @@ export default function RootLayout({
           HacktivStore
         </h1>
         <input
-          className="rounded-full flex w-1/2 sm:text-sm px-3"
+          className="rounded-full flex w-1/2 sm:text-sm px-3 border border-b-slate"
           placeholder="search product.."
         />
         <div>

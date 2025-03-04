@@ -44,7 +44,7 @@ export default async function Home() {
                 <span className="text-sm text-gray-500">
                   ⭐ {product.rating.rate} ({product.rating.count} reviews)
                 </span>
-                <button className="bg-emerald-600 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-emerald-800 transition">
+                <button className="bg-emerald-600 text-white px-4 py-2 rounded-full text-sm font-semibold hover:bg-emerald-800 transition">
                   Add to Cart
                 </button>
               </div>

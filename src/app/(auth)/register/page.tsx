@@ -17,61 +17,73 @@ export default function Register() {
   const [state, formAction, pending] = useActionState(register, initialState);
 
   return (
-    <>
+    <div className="min-h-screen flex items-center justify-center bg-gray-100">
       <form
         action={formAction}
-        className="p-8 bg-white w-[320px] rounded-md shadow-md flex flex-col gap-8"
+        className="bg-white w-[350px] p-6 rounded-lg shadow-lg flex flex-col gap-6"
       >
-        <h1 className="text-3xl">Register</h1>
+        <h1 className="text-2xl font-bold text-center text-gray-800">
+          Sign Up
+        </h1>
 
-        <div>
-          <label htmlFor="email">Email</label>
+        {/* Email Input */}
+        <div className="flex flex-col">
+          <label htmlFor="email" className="text-gray-700 font-medium">
+            Email
+          </label>
           <input
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             id="email"
             name="email"
-            className="w-full border border-gray-300 rounded-md p-2"
+            className="w-full border border-gray-300 rounded-md p-2 mt-1 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none"
           />
-          {
-            <div className="text-red-500 tex-sm mt-2">
-              {state.errors.email?.join(", ")}
-            </div>
-          }
+          {state.errors.email?.length > 0 && (
+            <p className="text-red-500 text-sm mt-1">
+              {state.errors.email.join(", ")}
+            </p>
+          )}
         </div>
 
-        <div>
-          <label htmlFor="password">Password</label>
+        {/* Password Input */}
+        <div className="flex flex-col">
+          <label htmlFor="password" className="text-gray-700 font-medium">
+            Password
+          </label>
           <input
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             type="password"
             id="password"
             name="password"
-            className="w-full border border-gray-300 rounded-md p-2"
+            className="w-full border border-gray-300 rounded-md p-2 mt-1 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none"
           />
-          {
-            <div className="text-red-500 tex-sm mt-2">
-              {state.errors.password?.join(", ")}
-            </div>
-          }
+          {state.errors.password?.length > 0 && (
+            <p className="text-red-500 text-sm mt-1">
+              {state.errors.password.join(", ")}
+            </p>
+          )}
         </div>
 
-        <div>
-          <button
-            disabled={pending}
-            className="w-full bg-blue-500 text-white rounded-md p-2 mt-4"
+        {/* Register Button */}
+        <button
+          disabled={pending}
+          className="w-full bg-emerald-600 text-white rounded-md py-2 font-semibold hover:bg-emerald-800 transition"
+        >
+          {pending ? "Saving data..." : "Register"}
+        </button>
+
+        {/* Login Link */}
+        <p className="text-sm text-center text-gray-600">
+          Already have an account?{" "}
+          <Link
+            href="/login"
+            className="text-emerald-600 font-medium hover:underline"
           >
-            {pending ? "Saving data..." : "Register"}
-          </button>
-        </div>
-
-        <div>
-          <Link href="/login" className="text-blue-500">
             Login
           </Link>
-        </div>
+        </p>
       </form>
-    </>
+    </div>
   );
 }
