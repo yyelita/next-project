@@ -1,24 +1,19 @@
-"use client"; // ✅ Mark as a Client Component
+import Link from "next/link";
+import { cookies } from "next/headers";
+import "../globals.css";
+import LogoutButton from "@/components/LogoutButton";
 
-import { logout } from "@/app/actions/auth"; // ✅ Import the logout function
-import { useRouter } from "next/navigation"; // ✅ Import useRouter for navigation
-import { useState } from "react";
-
-export default function RootLayout({
+export default async function MainLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
-  const [loading] = useState(false);
-  const router = useRouter(); // ✅ Use useRouter for client-side navigation
-
-  function handleCart(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
-    e.preventDefault();
-    router.push("/cart"); // ✅ Navigate to /cart properly
-  }
+}) {
+  // ✅ Get session from cookies (server-side)
+  const cookieStore = await cookies();
+  const session = cookieStore.get("session"); // Check if user is logged in
 
   return (
-    <>
+    <div>
       <header className="bg-green-500 h-12 text-xl px-7 py-2 flex justify-between">
         <h1 className="text-white font-arial font-bold cursor-pointer">
           HacktivStore
@@ -28,28 +23,29 @@ export default function RootLayout({
           placeholder="Search product..."
         />
         <div className="flex">
-          <button
-            onClick={handleCart} // ✅ Works correctly now
-            className="border border-white rounded-full py-1 px-3 cursor-pointer text-white mx-1.5"
-          >
-            <div className="text-sm text-center">Cart</div>
-          </button>
-
-          {/* ✅ Logout Button */}
-          <form action={logout}>
-            <button
-              type="submit"
-              className="border bg-green-600 border-white rounded-full py-1 px-3 cursor-pointer text-white"
-              disabled={loading}
-            >
-              <div className="text-sm font-bold text-center">
-                {loading ? "Logging out..." : "Log Out"}
-              </div>
-            </button>
-          </form>
+          {session ? (
+            <>
+              <Link
+                href="/cart"
+                className="border border-white rounded-full py-1 px-3 cursor-pointer text-white mx-1.5"
+              >
+                <div className="text-sm text-center">Cart</div>
+              </Link>
+              <LogoutButton /> {/* ✅ Server-side logout handling */}
+            </>
+          ) : (
+            <>
+              <Link href="/login" className="text-white font-semibold mx-2">
+                Masuk
+              </Link>
+              <Link href="/register" className="text-white font-semibold">
+                Daftar
+              </Link>
+            </>
+          )}
         </div>
       </header>
       {children}
-    </>
+    </div>
   );
 }

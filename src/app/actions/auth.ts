@@ -68,5 +68,5 @@ export async function login(
 
 export async function logout() {
   deleteSession();
-  redirect("/login");
+  redirect("/");
 }

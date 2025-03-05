@@ -3,31 +3,39 @@ import { decrypt } from "./app/lib/session";
 
 export default async function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
+  const session = req.cookies.get("session")?.value;
+
+  // Allow public routes without authentication
+  //   const isPublicRoute = ["/", "/login", "/register"].includes(pathname);
+
+  if (!session) {
+    // If the user is NOT logged in, only block protected routes
+    const isProtectedRoute =
+      pathname.startsWith("/products") || pathname.startsWith("/cart");
+    if (isProtectedRoute) {
+      return NextResponse.redirect(new URL("/login", req.nextUrl)); // Redirect to root instead of login
+    }
+    return NextResponse.next();
+  }
 
   try {
-    const session = req.cookies.get("session")?.value;
-
-    if (!session) {
-      throw new Error("Unauthorized");
-    }
-
+    // Validate the session
     const payload = await decrypt(session);
     const response = NextResponse.next();
     response.cookies.set("userId", payload._id as string);
     return response;
-  } catch (error: unknown) {
-    console.error((error as Error).message);
+  } catch (error) {
+    console.error("Invalid session:", error);
 
-    if (pathname.startsWith("/api")) {
-      return Response.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
-    return NextResponse.redirect(new URL("/login", req.nextUrl));
+    // If session is invalid, clear it and send the user to "/"
+    const response = NextResponse.redirect(new URL("/", req.nextUrl));
+    response.cookies.delete("session");
+    return response;
   }
 }
 
 export const config = {
   matcher: [
-    "/((?!login|register|_next/static|_next/image|favicon.ico|sitemap.xml|robots.txt).*)",
+    "/((?!_next/static|_next/image|favicon.ico|sitemap.xml|robots.txt).*)",
   ],
 };
