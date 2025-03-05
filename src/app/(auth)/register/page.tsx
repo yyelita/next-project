@@ -5,12 +5,14 @@ import { useActionState, useState } from "react";
 
 const initialState = {
   errors: {
+    name: [],
     email: [],
     password: [],
   },
 };
 
 export default function Register() {
+  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
@@ -25,6 +27,25 @@ export default function Register() {
         <h1 className="text-2xl font-bold text-center text-gray-800">
           Sign Up
         </h1>
+
+        {/* Name Input */}
+        <div className="flex flex-col">
+          <label htmlFor="name" className="text-gray-700 font-medium">
+            Name
+          </label>
+          <input
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            id="name"
+            name="name"
+            className="w-full border border-gray-300 rounded-md p-2 mt-1 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none"
+          />
+          {state.errors.name?.length > 0 && (
+            <p className="text-red-500 text-sm mt-1">
+              {state.errors.name.join(", ")}
+            </p>
+          )}
+        </div>
 
         {/* Email Input */}
         <div className="flex flex-col">

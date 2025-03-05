@@ -3,16 +3,18 @@ import bcrypt from "bcrypt";
 
 export interface UserType {
   _id?: string;
+  name: string;
   email: string;
   password: string;
 }
 
 const collection = db.collection<UserType>("users");
 class User {
-  static async create({ email, password }: UserType) {
+  static async create({ name, email, password }: UserType) {
     const hashedPassword = bcrypt.hashSync(password, 10);
 
     const result = await collection.insertOne({
+      name,
       email,
       password: hashedPassword,
     });
