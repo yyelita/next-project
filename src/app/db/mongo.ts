@@ -9,4 +9,4 @@ export const client = new MongoClient(uri, {
   },
 });
 
-export const db = client.db("next_js");
+export const db = client.db("next_project");

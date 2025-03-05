@@ -16,6 +16,7 @@ export default function Login() {
           <input
             type="email"
             id="email"
+            name="email"
             className="w-full border border-gray-300 rounded-md p-2 mt-1 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none"
           />
         </div>
@@ -28,6 +29,7 @@ export default function Login() {
           <input
             type="password"
             id="password"
+            name="password"
             className="w-full border border-gray-300 rounded-md p-2 mt-1 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none"
           />
         </div>
