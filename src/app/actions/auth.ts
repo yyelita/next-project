@@ -30,8 +30,9 @@ export async function register(prevState: FormResponse, formData: FormData) {
       errors: result.error.flatten().fieldErrors,
     };
   }
+  const hashedPassword = await bcrypt.hash(password, 10);
 
-  await User.create({ email, password });
+  await User.create({ email, password: hashedPassword });
   redirect("/login");
 }
 
@@ -59,7 +60,7 @@ export async function login(
   }
 
   // await createSession(user);
-  redirect("/products");
+  redirect("/");
 }
 
 export async function logout() {

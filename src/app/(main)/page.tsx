@@ -14,6 +14,7 @@ interface IProducts {
 }
 export default async function Products() {
   const response = await fetch("https://fakestoreapi.com/products");
+
   const products: IProducts[] = await response.json();
 
   return (
