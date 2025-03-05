@@ -1,58 +1,66 @@
 "use client";
+import { useCart } from "@/app/hooks/useCart";
+import { useState, useEffect } from "react";
+import Link from "next/link";
 
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
-
+// 1️⃣ Define a Product Type
 interface IProduct {
-  id: number;
+  _id: string;
   title: string;
-  price: number;
   image: string;
 }
 
 export default function Cart() {
-  const router = useRouter();
-  const [cart, setCart] = useState<{ [key: number]: number }>({});
-  const [products, setProducts] = useState<IProduct[]>([]);
+  const { cart, removeFromCart } = useCart();
+  const [products, setProducts] = useState<IProduct[]>([]); // 2️⃣ Ensure products have a type
 
-  // Load cart from localStorage
-  useEffect(() => {
-    const storedCart = localStorage.getItem("cart");
-    if (storedCart) {
-      setCart(JSON.parse(storedCart));
-    }
-  }, []);
-
-  // Fetch product details when cart changes
   useEffect(() => {
     async function fetchProducts() {
-      if (Object.keys(cart).length === 0) {
-        setProducts([]);
-        return;
+      try {
+        const response = await fetch("/api/products");
+        if (!response.ok) {
+          throw new Error("Failed to fetch products");
+        }
+        const data: IProduct[] = await response.json();
+        setProducts(data);
+      } catch (error) {
+        console.error("Error fetching products:", error);
       }
-
-      const productIds = Object.keys(cart).join(",");
-      const response = await fetch(`/api/products?ids=${productIds}`);
-      const data: IProduct[] = await response.json();
-      setProducts(data);
     }
-
     fetchProducts();
-  }, [cart]);
+  }, []);
 
-  // Remove item from cart
-  function removeFromCart(productId: number) {
-    const updatedCart = { ...cart };
-    delete updatedCart[productId]; // Remove item
-    setCart(updatedCart);
-    localStorage.setItem("cart", JSON.stringify(updatedCart)); // Update localStorage
-  }
+  const cartItems = Object.entries(cart).map(([id, quantity]) => {
+    // 3️⃣ Use explicit typing in .find()
+    const product = products.find((p: IProduct) => p._id === id);
+    if (!product) return null; // Prevent errors when product is not found
+
+    return (
+      <li key={id} className="flex justify-between items-center border-b p-3">
+        <div className="flex items-center gap-4">
+          <img
+            src={product.image}
+            alt={product.title}
+            className="w-16 h-16 object-cover rounded-md"
+          />
+          <span className="text-lg font-semibold text-black">
+            {product.title} - {quantity} pcs
+          </span>
+        </div>
+        <button
+          onClick={() => removeFromCart(id)}
+          className="bg-red-500 text-white px-3 py-1 rounded-md hover:bg-red-700 transition"
+        >
+          Remove
+        </button>
+      </li>
+    );
+  });
 
   return (
     <div className="p-6">
-      <h2 className="text-2xl font-bold text-center font-calibri">Cart</h2>
-
-      {Object.keys(cart).length === 0 ? (
+      <h2 className="text-2xl font-bold text-center">Cart</h2>
+      {cartItems.length === 0 ? (
         <div className="flex flex-col justify-center items-center my-8">
           <img
             src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT0NFDkRbiBU3YN6StTz4TbcNYdrYTY-ZZoyw&s"
@@ -61,44 +69,13 @@ export default function Cart() {
           />
           <p className="font-medium mt-4">
             Your cart is empty, let&apos;s{" "}
-            <button
-              onClick={() => router.push("/")}
-              className="text-emerald-500 underline"
-            >
+            <Link href="/" className="text-emerald-500 underline">
               shop!
-            </button>
+            </Link>
           </p>
         </div>
       ) : (
-        <ul>
-          {products.map((product) => {
-            const quantity = cart[product.id] ?? 0;
-
-            return (
-              <li
-                key={product.id}
-                className="flex justify-between items-center border-b p-3"
-              >
-                <div className="flex items-center gap-4">
-                  <img
-                    src={product.image}
-                    alt={product.title}
-                    className="w-16 h-16 object-cover rounded-md"
-                  />
-                  <span className="text-lg font-semibold text-black">
-                    {product.title} - {quantity} pcs
-                  </span>
-                </div>
-                <button
-                  onClick={() => removeFromCart(product.id)}
-                  className="bg-red-500 text-white px-3 py-1 rounded-md hover:bg-red-700 transition"
-                >
-                  Remove
-                </button>
-              </li>
-            );
-          })}
-        </ul>
+        <ul>{cartItems}</ul>
       )}
     </div>
   );

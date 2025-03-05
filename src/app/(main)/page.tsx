@@ -2,12 +2,13 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import AddToCartButton from "@/components/AddToCartButton";
+import { useCart } from "@/app/hooks/useCart"; // Import shared cart hook
 
 interface IProduct {
   _id: string;
   title: string;
   price: number;
-  description: string;
   category: string;
   image: string;
   quantity: number;
@@ -20,16 +21,13 @@ interface IProduct {
 export default function ProductList() {
   const [products, setProducts] = useState<IProduct[]>([]);
   const [loading, setLoading] = useState(true);
+  const { stock } = useCart(); // Use shared stock state
 
   useEffect(() => {
     async function fetchProducts() {
       try {
         const response = await fetch("/api/products");
-
-        if (!response.ok) {
-          throw new Error("Failed to fetch products");
-        }
-
+        if (!response.ok) throw new Error("Failed to fetch products");
         const data: IProduct[] = await response.json();
         setProducts(data);
       } catch (error) {
@@ -54,11 +52,7 @@ export default function ProductList() {
             key={product._id}
             className="bg-white rounded-lg shadow-md overflow-hidden"
           >
-            <Link
-              key={product._id}
-              href={`/products/${product._id}`}
-              className="block"
-            >
+            <Link href={`/products/${product._id}`} className="block">
               <img
                 src={product.image}
                 alt={product.title}
@@ -77,9 +71,7 @@ export default function ProductList() {
                 <span className="text-sm text-gray-500">
                   ⭐ {product.rating.rate} ({product.rating.count} reviews)
                 </span>
-                <button className="bg-emerald-600 text-white px-4 py-2 rounded-full text-xs font-semibold hover:bg-emerald-800 transition">
-                  Add to Cart
-                </button>
+                <AddToCartButton productId={product._id} />
               </div>
             </div>
           </div>
