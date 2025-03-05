@@ -4,16 +4,13 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 
 interface IProduct {
-  id: number;
+  _id: string;
   title: string;
   price: number;
   description: string;
   category: string;
   image: string;
-  rating: {
-    rate: number;
-    count: number;
-  };
+  quantity: number;
 }
 
 export default function ProductDetail({ params }: { params: { id: string } }) {
@@ -24,16 +21,14 @@ export default function ProductDetail({ params }: { params: { id: string } }) {
   useEffect(() => {
     async function fetchProduct() {
       try {
-        const response = await fetch(
-          `https://fakestoreapi.com/products/${params.id}`
-        );
+        const response = await fetch(`/api/products/${params.id}`);
 
         if (!response.ok) {
-          setProduct(null);
-        } else {
-          const data: IProduct = await response.json();
-          setProduct(data);
+          throw new Error("Product not found");
         }
+
+        const data: IProduct = await response.json();
+        setProduct(data);
       } catch (error) {
         console.error("Error fetching product:", error);
         setProduct(null);
@@ -42,7 +37,9 @@ export default function ProductDetail({ params }: { params: { id: string } }) {
       }
     }
 
-    fetchProduct();
+    if (params.id) {
+      fetchProduct();
+    }
   }, [params.id]);
 
   if (loading) return <p className="text-center text-gray-500">Loading...</p>;
@@ -72,9 +69,7 @@ export default function ProductDetail({ params }: { params: { id: string } }) {
             <p className="text-emerald-600 font-semibold text-xl mt-2">
               ${product.price}
             </p>
-            <p className="text-gray-500">
-              ⭐ {product.rating.rate} ({product.rating.count} reviews)
-            </p>
+            <p className="text-gray-500">Stock: {product.quantity}</p>
 
             <button className="mt-4 bg-emerald-600 text-white px-6 py-2 rounded-full text-lg hover:bg-emerald-800 transition">
               Add to Cart

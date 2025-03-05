@@ -1,47 +1,76 @@
+"use client";
+
+import { useState, useEffect } from "react";
 import Link from "next/link";
 
-interface IProducts {
-  id: number;
+interface IProduct {
+  _id: string;
   title: string;
   price: number;
   description: string;
   category: string;
   image: string;
+  quantity: number;
   rating: {
     rate: number;
     count: number;
   };
 }
-export default async function Products() {
-  const response = await fetch("https://fakestoreapi.com/products");
 
-  const products: IProducts[] = await response.json();
+export default function ProductList() {
+  const [products, setProducts] = useState<IProduct[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function fetchProducts() {
+      try {
+        const response = await fetch("/api/products");
+
+        if (!response.ok) {
+          throw new Error("Failed to fetch products");
+        }
+
+        const data: IProduct[] = await response.json();
+        setProducts(data);
+      } catch (error) {
+        console.error("Error fetching products:", error);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchProducts();
+  }, []);
+
+  if (loading) return <p className="text-center text-gray-500">Loading...</p>;
+  if (products.length === 0)
+    return <p className="text-center text-red-500">No products found</p>;
 
   return (
-    <div className="p-8">
-      <h1 className="text-3xl font-bold text-center mb-6">Featured Products</h1>
-
+    <div className="min-h-screen p-6">
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
         {products.map((product) => (
           <div
-            key={product.id}
-            className="bg-white border border-gray-300 rounded-lg shadow-md overflow-hidden transition hover:shadow-lg"
+            key={product._id}
+            className="bg-white rounded-lg shadow-md overflow-hidden"
           >
-            <Link href={`/products/${product.id}`}>
+            <Link
+              key={product._id}
+              href={`/products/${product._id}`}
+              className="block"
+            >
               <img
-                className="w-full h-56 object-contain p-4"
                 src={product.image}
                 alt={product.title}
+                className="w-full h-56 object-contain p-4 bg-gray-100"
               />
             </Link>
             <div className="p-4">
-              <h2 className="text-lg font-semibold text-gray-800 truncate">
-                {/* {product.title} */}
-              </h2>
-              <p className="text-gray-600 text-sm line-clamp-2">
-                {product.description}
+              <h2 className="text-lg font-semibold">{product.title}</h2>
+              <p className="text-gray-600 text-sm truncate">
+                {product.category}
               </p>
-              <p className="text-xl font-bold text-emerald-600 mt-2">
+              <p className="text-emerald-600 font-bold text-lg mt-2">
                 ${product.price}
               </p>
               <div className="flex items-center justify-between mt-3">
