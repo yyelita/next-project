@@ -15,9 +15,9 @@ const userSchema = z.object({
 
 export type FormResponse = {
   errors: {
-    name?: string[] | undefined;
-    email?: string[] | undefined;
-    password?: string[] | undefined;
+    name: string[];
+    email: string[];
+    password: string[];
   };
 };
 
@@ -30,7 +30,11 @@ export async function register(prevState: FormResponse, formData: FormData) {
 
   if (!result.success) {
     return {
-      errors: result.error.flatten().fieldErrors,
+      errors: {
+        name: result.error.flatten().fieldErrors.name ?? [], // ✅ Always an array
+        email: result.error.flatten().fieldErrors.email ?? [],
+        password: result.error.flatten().fieldErrors.password ?? [],
+      },
     };
   }
   const hashedPassword = await bcrypt.hash(password, 10);

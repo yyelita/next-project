@@ -5,9 +5,6 @@ export default async function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
   const session = req.cookies.get("session")?.value;
 
-  // Allow public routes without authentication
-  //   const isPublicRoute = ["/", "/login", "/register"].includes(pathname);
-
   if (!session) {
     // If the user is NOT logged in, only block protected routes
     const isProtectedRoute =
