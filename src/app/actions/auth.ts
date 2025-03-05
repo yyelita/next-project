@@ -30,9 +30,9 @@ export async function register(prevState: FormResponse, formData: FormData) {
       errors: result.error.flatten().fieldErrors,
     };
   }
-  const hashedPassword = await bcrypt.hash(password, 10);
+  // const hashedPassword = await bcrypt.hash(password, 10);
 
-  await User.create({ email, password: hashedPassword });
+  await User.create({ email, password });
   redirect("/login");
 }
 
