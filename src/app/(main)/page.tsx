@@ -2,8 +2,6 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import AddToCartButton from "@/components/AddToCartButton";
-import { useCart } from "@/app/hooks/useCart"; // Import shared cart hook
 
 interface IProduct {
   _id: string;
@@ -11,7 +9,7 @@ interface IProduct {
   price: number;
   category: string;
   image: string;
-  quantity: number;
+  quantity?: number;
   rating: {
     rate: number;
     count: number;
@@ -21,7 +19,6 @@ interface IProduct {
 export default function ProductList() {
   const [products, setProducts] = useState<IProduct[]>([]);
   const [loading, setLoading] = useState(true);
-  const { stock } = useCart(); // Use shared stock state
 
   useEffect(() => {
     async function fetchProducts() {
@@ -39,6 +36,21 @@ export default function ProductList() {
 
     fetchProducts();
   }, []);
+
+  const addToCart = (product: IProduct) => {
+    const cart: IProduct[] = JSON.parse(localStorage.getItem("cart") || "[]");
+
+    const existingProduct = cart.find((item) => item._id === product._id);
+
+    if (existingProduct) {
+      existingProduct.quantity = (existingProduct.quantity || 1) + 1;
+    } else {
+      cart.push({ ...product, quantity: 1 });
+    }
+
+    localStorage.setItem("cart", JSON.stringify(cart));
+    alert(`${product.title} added to cart!`);
+  };
 
   if (loading) return <p className="text-center text-gray-500">Loading...</p>;
   if (products.length === 0)
@@ -71,7 +83,12 @@ export default function ProductList() {
                 <span className="text-sm text-gray-500">
                   ⭐ {product.rating.rate} ({product.rating.count} reviews)
                 </span>
-                <AddToCartButton productId={product._id} />
+                <button
+                  onClick={() => addToCart(product)}
+                  className="px-4 py-2 bg-emerald-600 text-white rounded-full text-xs font-semibold cursor-pointer hover:bg-emerald-800"
+                >
+                  Add to Cart
+                </button>
               </div>
             </div>
           </div>

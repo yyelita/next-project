@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { cookies } from "next/headers";
 import "../globals.css";
-import LogoutButton from "@/components/LogoutButton";
+import LogoutButton from "@/app/components/LogoutButton";
 
 export default async function MainLayout({
   children,
