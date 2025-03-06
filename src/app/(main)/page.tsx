@@ -36,6 +36,7 @@ export default function ProductList() {
 
   async function handleSearch() {
     try {
+      setLoading(true);
       const res = await fetch(`/api/products?query=${search}`);
       const data = await res.json();
       setProducts(data);
