@@ -2,7 +2,16 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { IProduct } from "@/app/definitions/product";
+
+interface IProduct {
+  _id: string;
+  title: string;
+  price: number;
+  description: string;
+  category: string;
+  image: string;
+  quantity: number;
+}
 
 export default function ProductDetail({ params }: { params: { id: string } }) {
   const [product, setProduct] = useState<IProduct | null>(null);
