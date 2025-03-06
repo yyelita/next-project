@@ -19,23 +19,40 @@ interface IProduct {
 export default function ProductList() {
   const [products, setProducts] = useState<IProduct[]>([]);
   const [loading, setLoading] = useState(true);
+  const [search, setSearch] = useState("");
+
+  async function fetchProducts() {
+    try {
+      const response = await fetch("/api/products");
+      if (!response.ok) throw new Error("Failed to fetch products");
+      const data: IProduct[] = await response.json();
+      setProducts(data);
+    } catch (error) {
+      console.error("Error fetching products:", error);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function handleSearch() {
+    try {
+      const res = await fetch(`/api/products?query=${search}`);
+      const data = await res.json();
+      setProducts(data);
+    } catch (error) {
+      console.error("Error searching products:", error);
+    } finally {
+      setLoading(false);
+    }
+  }
 
   useEffect(() => {
-    async function fetchProducts() {
-      try {
-        const response = await fetch("/api/products");
-        if (!response.ok) throw new Error("Failed to fetch products");
-        const data: IProduct[] = await response.json();
-        setProducts(data);
-      } catch (error) {
-        console.error("Error fetching products:", error);
-      } finally {
-        setLoading(false);
-      }
+    if (!search) {
+      fetchProducts();
+      return;
     }
-
-    fetchProducts();
-  }, []);
+    handleSearch();
+  }, [search]);
 
   const addToCart = (product: IProduct) => {
     const cart: IProduct[] = JSON.parse(localStorage.getItem("cart") || "[]");
@@ -57,7 +74,14 @@ export default function ProductList() {
     return <p className="text-center text-red-500">No products found</p>;
 
   return (
-    <div className="min-h-screen p-6">
+    <div className="flex flex-col p-6">
+      <div className="flex justify-center">
+        <input
+          className="rounded-full flex w-1/2 sm:text-sm px-3 py-2 border border-b-slate mb-6"
+          placeholder="Search product..."
+          onChange={(e) => setSearch(e.target.value)}
+        />
+      </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
         {products.map((product) => (
           <div

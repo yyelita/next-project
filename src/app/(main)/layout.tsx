@@ -15,13 +15,12 @@ export default async function MainLayout({
   return (
     <div>
       <header className="bg-green-500 h-12 text-xl px-7 py-2 flex justify-between">
-        <h1 className="text-white font-arial font-bold cursor-pointer">
-          HacktivStore
-        </h1>
-        <input
-          className="rounded-full flex w-1/2 sm:text-sm px-3 border border-b-slate"
-          placeholder="Search product..."
-        />
+        <Link href="/">
+          <h1 className="text-white font-arial font-bold cursor-pointer">
+            HacktivStore
+          </h1>
+        </Link>
+
         <div className="flex">
           {session ? (
             <>
